@@ -12,108 +12,150 @@ def language_identification(dummy_input: str) -> dict:
         "question": question
     }
 
-def source_code_collection() -> dict:
-    """1
+def source_code_collection(language_identification_result: dict) -> dict:
+    """
     Collects source code and asks for confirmation.
     """
-    sample_code = (
-        "def example_function():\n"
-        "    return 'This is a sample code snippet.'"
-    )
-    formatted_code = f"```python\n{sample_code}\n```"
-    question = "Is this the code you want to transform to your target language? Or would you like to make any changes?"
+    # Extract target language from previous result if available
+    target_language = ""
+    if language_identification_result and "response" in language_identification_result:
+        # You would need to parse the response to extract the target language
+        # This is a placeholder for the actual implementation
+        target_language = "target language"  # Replace with actual parsing logic
+    
+    question = f"Please provide the source code you want to transform{' to ' + target_language if target_language else ''}."
     return {
         "status": "success",
-        "formatted_code": formatted_code,
         "question": question
     }
 
-def transformation_rules_definition(source_language: str, target_language: str) -> dict:
+def transformation_rules_definition(language_identification_result: dict, source_code_collection_result: dict) -> dict:
     """
-    Defines markdown-formatted transformation rules.
+    Defines comprehensive transformation rules based on source and target languages.
     """
-    rules_md = f"""
-## Rule Set Summary
-Transformation strategy from **{source_language}** to **{target_language}**.
+    # Extract required information from previous results
+    # In a real implementation, you would parse these inputs properly
+    
+    rules_md = """
+# Rule Set Summary
+Clear overview of the transformation strategy.
 
-### General Rules
-- Preserve core logic, control flow, and data structure semantics.
-- Avoid over-complicating transformations.
+## General Rules
+Core transformation rules common to most code blocks.
 
-### Specific Rules
-- Map functions and methods according to language syntax.
-- Translate data types (`str` → `String`, `int` → `int`).
-- Convert control structures (`for`, `if`, `while`) idiomatically.
+## Specific Rules
+Detailed language-specific mappings with clear examples.
 
-### Edge Cases
-- Handle null-check differences.
-- Convert exception handling blocks accurately.
-- Resolve language-specific idioms carefully.
+## Edge Cases
+Handling special or uncommon scenarios.
 
-### Best Practices
-- Follow idiomatic {target_language} conventions.
-- Optimize for readability and maintainability.
+## Best Practices
+Guidelines for writing idiomatic code in the target language.
     """
-    return {"status": "success", "rules_md": rules_md}
+    
+    return {
+        "status": "success", 
+        "rules_md": rules_md
+    }
 
-def rules_validation(rules_md: str) -> dict:
+def rules_validation(transformation_rules_definition_result: dict) -> dict:
     """
-    Shows rules to the user and asks for confirmation.
+    Shows transformation rules to the user and collects feedback.
     """
-    question = "Do these transformation rules look correct and complete to you? Or would you like to suggest any changes?"
-    return {"status": "success", "rules_md": rules_md, "question": question}
+    rules_md = transformation_rules_definition_result.get("rules_md", "")
+    
+    return {
+        "status": "success",
+        "rules_md": rules_md,
+        "question": "Do these transformation rules look correct and complete to you? Or would you like to suggest any changes?"
+    }
 
-def rules_refinement(rules_md: str, feedback: str = "") -> dict:
+def rules_refinement(rules_validation_result: dict) -> dict:
     """
-    Incorporates feedback and returns refined rules.
+    Updates transformation rules based on user feedback.
     """
+    rules_md = rules_validation_result.get("rules_md", "")
+    feedback = rules_validation_result.get("response", "")
+    
+    # If user confirmed rules are fine, return original rules
+    if feedback and ("fine" in feedback.lower() or "good" in feedback.lower() or "yes" in feedback.lower()):
+        return {
+            "status": "success",
+            "refined_rules_md": rules_md
+        }
+    
+    # In a real implementation, you would update the rules based on feedback
     refined_md = rules_md
     if feedback:
-        refined_md += f"\n\n**Feedback incorporated:** {feedback}"
-    return {"status": "success", "refined_rules_md": refined_md}
-
-def initial_transformation(source_code: str, rules_md: str, target_language: str) -> dict:
-    """
-    Applies basic transformations and presents transformed code in markdown.
-    """
-    transformed_code = f"// Transformed Code\n{source_code}"
-    formatted_transformed = f"```{target_language.lower()}\n{transformed_code}\n```"
-    notes = "Basic transformation applied using defined rules."
+        refined_md += f"\n\n### Updates Based on Feedback\n{feedback}"
+    
     return {
-        "status": "success",
-        "transformed_code_md": formatted_transformed,
-        "notes": notes
+        "status": "success", 
+        "refined_rules_md": refined_md
     }
 
-def transformation_feedback(transformed_code_md: str) -> dict:
+def initial_transformation(source_code_collection_result: dict, rules_refinement_result: dict, language_identification_result: dict) -> dict:
     """
-    Displays transformed code and asks for feedback.
+    Performs initial code transformation using the approved rule set.
     """
-    question = "Are you satisfied with this transformation, or would you like to make any changes?"
+    # Extract source code from previous results
+    source_code = ""
+    if source_code_collection_result and "response" in source_code_collection_result:
+        source_code = source_code_collection_result["response"]
+    
+    # Extract target language from language identification
+    target_language = "unknown"  # Default placeholder
+    if language_identification_result and "response" in language_identification_result:
+        # In a real implementation, you would parse the response to get the target language
+        pass
+    
+    # Apply transformation rules
+    # This is a placeholder - in a real implementation, you would apply the rules to transform the code
+    transformed_code = f"// Transformed from source code\n{source_code}"
+    
     return {
         "status": "success",
-        "transformed_code_md": transformed_code_md,
-        "question": question
+        "transformed_code": transformed_code,
+        "transformation_notes": "Key changes made during transformation."
     }
 
-def final_transformation(source_code: str, transformed_code_md: str, refined_rules_md: str, target_language: str) -> dict:
+def transformation_feedback(initial_transformation_result: dict) -> dict:
     """
-    Generates final production-ready code.
+    Presents transformed code to the user and collects feedback.
     """
-    final_code = transformed_code_md + "\n// Final adjustments applied"
-    implementation_notes = "Final transformation completed based on reviewed rules."
-    usage_guidelines = f"Deploy this {target_language} code after thorough testing."
+    transformed_code = initial_transformation_result.get("transformed_code", "")
+    
     return {
         "status": "success",
-        "final_code_md": final_code,
-        "implementation_notes": implementation_notes,
-        "usage_guidelines": usage_guidelines
+        "transformed_code": transformed_code,
+        "question": "Are you satisfied with this transformation, or would you like to make any changes?"
     }
 
-# ✅ Register root_agent following edw.json workflow
+def final_transformation(source_code_collection_result: dict, initial_transformation_result: dict, rules_refinement_result: dict) -> dict:
+    """
+    Generates the final, production-ready version of the code.
+    """
+    # Extract relevant data from previous tasks
+    transformed_code = initial_transformation_result.get("transformed_code", "")
+    feedback = transformation_feedback_result.get("response", "") if "transformation_feedback_result" in locals() else ""
+    
+    # Apply final refinements
+    # In a real implementation, you would incorporate feedback and apply final polish
+    final_code = transformed_code
+    if feedback:
+        final_code += f"\n// Incorporating feedback: {feedback}"
+    
+    return {
+        "status": "success",
+        "final_code": final_code,
+        "implementation_notes": "Key considerations during transformation.",
+        "usage_guidelines": "Instructions or context for using the transformed code."
+    }
+
+# Register EDW transformation agent according to workflow
 root_agent = Agent(
     name="edw_transformation_agent",
-    model="gemini-2.0-flash",
+    model="gemini-2.0-flash",  # Using the model specified in your code
     description="Agent to modernize legacy EDW code by facilitating code transformations through a structured workflow.",
     instruction="You guide code transformations via language detection, code collection, rules definition, validation, transformation, and finalization.",
     tools=[
@@ -130,4 +172,3 @@ root_agent = Agent(
 
 if __name__ == "__main__":
     print("EDW Transformation Agent loaded.")
-
