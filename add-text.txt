@@ -1,0 +1,16 @@
+----
+source code and target code:
+
+from Informatica XML to BigQuery SQL
+
+
+----
+## Feedback on rules:
+
+
+Add these rules too:
+1. Null Treatment: Define explicit rules for NULL handling across different transformation types
+2. Error Logging: Include options for capturing and logging data quality issues during transformation
+
+
+----
